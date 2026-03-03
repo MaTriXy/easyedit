@@ -15,11 +15,8 @@ const schema = z.object({
   height: z.number(),
   userAPIKey: z.string().nullable(),
   model: z
-    .enum([
-      "black-forest-labs/FLUX.1-kontext-dev",
-      "black-forest-labs/FLUX.1-kontext-pro",
-    ])
-    .default("black-forest-labs/FLUX.1-kontext-dev"),
+    .enum(["black-forest-labs/FLUX.2-flex", "black-forest-labs/FLUX.2-pro"])
+    .default("black-forest-labs/FLUX.2-flex"),
 });
 
 export async function generateImage(

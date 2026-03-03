@@ -10,7 +10,7 @@ export function UserAPIKey() {
 
   // Initialize from sessionStorage
   useEffect(() => {
-    const storedKey = sessionStorage.getItem("togetherApiKey");
+    const storedKey = localStorage.getItem("togetherApiKey");
     if (storedKey) {
       setUserAPIKey(storedKey);
     }
@@ -18,7 +18,7 @@ export function UserAPIKey() {
 
   const validateAndSaveApiKey = async (apiKey: string) => {
     if (!apiKey) {
-      sessionStorage.removeItem("togetherApiKey");
+      localStorage.removeItem("togetherApiKey");
       return false;
     }
 
@@ -35,7 +35,7 @@ export function UserAPIKey() {
       const result = await response.json();
 
       if (result.success) {
-        sessionStorage.setItem("togetherApiKey", apiKey);
+        localStorage.setItem("togetherApiKey", apiKey);
         toast.success("API key validated and saved!");
         return true;
       } else {
@@ -56,7 +56,7 @@ export function UserAPIKey() {
     setUserAPIKey(value);
 
     if (value.length === 0) {
-      sessionStorage.removeItem("togetherApiKey");
+      localStorage.removeItem("togetherApiKey");
       return;
     }
 

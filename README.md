@@ -4,12 +4,12 @@
 </a>
 
 <p align="center">
-  Edit images with a single prompt. Powered by Flux through Together.ai.
+  Edit images with a single prompt. Powered by Flux 2 through Together.ai.
 </p>
 
 ## Tech stack
 
-- [Flux.1 Kontext](https://www.together.ai/blog/flux-1-kontext) from BFL for the image model
+- [Flux 2](https://www.together.ai/blog/flux-2-multi-reference-image-generation-now-available-on-together-ai) from BFL for the image model
 - [Together AI](https://togetherai.link) for inference
 - Next.js app router with Tailwind
 - Helicone for observability

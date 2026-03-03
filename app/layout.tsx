@@ -119,11 +119,11 @@ export default function RootLayout({
           <p className="text-sm text-gray-400">
             Powered by{" "}
             <a
-              href="https://www.together.ai/blog/flux-1-kontext"
+              href="https://www.together.ai/blog/flux-2-multi-reference-image-generation-now-available-on-together-ai"
               target="_blank"
               className="text-gray-200 underline underline-offset-2"
             >
-              Flux Kontext
+              Flux.2
             </a>{" "}
             on{" "}
             <a

@@ -89,10 +89,11 @@ export function ImageUploader({
             <p className="mt-1 text-gray-500">or click to upload</p>
           </div>
 
-          <div className="pb-3">
+          <div className="pb-4 flex items-center justify-center flex-row gap-2">
             <p className="text-sm text-gray-500">
-              Powered by <span className="text-white">Together.ai</span>
+              Powered by
             </p>
+            <img src="/poweredby.png" className="h-[20px]" />
           </div>
         </>
       ) : (

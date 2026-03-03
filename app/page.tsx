@@ -40,9 +40,8 @@ export default function Home() {
   const [prompt, setPrompt] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
   const [selectedModel, setSelectedModel] = useState<
-    | "black-forest-labs/FLUX.1-kontext-dev"
-    | "black-forest-labs/FLUX.1-kontext-pro"
-  >("black-forest-labs/FLUX.1-kontext-dev");
+    "black-forest-labs/FLUX.2-flex" | "black-forest-labs/FLUX.2-pro"
+  >("black-forest-labs/FLUX.2-flex");
   const [hasApiKey, setHasApiKey] = useState(false);
 
   const activeImage = useMemo(
@@ -73,8 +72,8 @@ export default function Home() {
       setHasApiKey(hasKey);
 
       // If Pro model is selected but no API key, switch to Dev model
-      if (!hasKey && selectedModel === "black-forest-labs/FLUX.1-kontext-pro") {
-        setSelectedModel("black-forest-labs/FLUX.1-kontext-dev");
+      if (!hasKey && selectedModel === "black-forest-labs/FLUX.2-pro") {
+        setSelectedModel("black-forest-labs/FLUX.2-flex");
       }
     };
 
@@ -322,14 +321,14 @@ export default function Home() {
                           disabled={pending}
                           className="w-full appearance-none rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                          <option value="black-forest-labs/FLUX.1-kontext-dev">
-                            Flux Kontext Dev
+                          <option value="black-forest-labs/FLUX.2-flex">
+                            Flux 2 Flex
                           </option>
                           <option
-                            value="black-forest-labs/FLUX.1-kontext-pro"
+                            value="black-forest-labs/FLUX.2-pro"
                             disabled={!hasApiKey}
                           >
-                            Flux Kontext Pro{" "}
+                            Flux 2 Pro{" "}
                             {!hasApiKey && "(Together API key required)"}
                           </option>
                         </select>
@@ -350,8 +349,7 @@ export default function Home() {
                         </div>
                       </div>
                       {!hasApiKey &&
-                        selectedModel ===
-                          "black-forest-labs/FLUX.1-kontext-pro" && (
+                        selectedModel === "black-forest-labs/FLUX.2-pro" && (
                           <p className="mt-1 text-xs text-amber-400">
                             Pro model requires an API key. Please add your
                             Together AI API key to use this model.

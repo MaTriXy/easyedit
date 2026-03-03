@@ -4,11 +4,10 @@ import { getTogether } from "@/lib/get-together";
 import { getIPAddress, getRateLimiter } from "@/lib/rate-limiter";
 import dedent from "dedent";
 import invariant from "tiny-invariant";
-import { z } from "zod";
-// import { zodToJsonSchema } from "zod-to-json-schema";
+import { z } from "zod/v4";
 
 const schema = z.array(z.string());
-// const jsonSchema = zodToJsonSchema(schema, { target: "openAi" });
+const jsonSchema = z.toJSONSchema(schema);
 
 const ratelimit = getRateLimiter();
 
@@ -57,7 +56,7 @@ Provide only the JSON response, no additional text.
 
 Here's some additional information about the image model that will be used to edit the image based on the prompt:
 
-With FLUX.1 Kontext you can modify an input image via simple text instructions, enabling flexible and instant image editing - no need for finetuning or complex editing workflows. The core capabilities of the the FLUX.1 Kontext suite are:
+With FLUX 2 you can modify an input image via simple text instructions, enabling flexible and instant image editing - no need for finetuning or complex editing workflows. The core capabilities of FLUX 2 are:
 
 - Character consistency: Preserve unique elements of an image, such as a reference character or object in a picture, across multiple scenes and environments.
 - Local editing: Make targeted modifications of specific elements in an image without affecting the rest.
@@ -65,7 +64,7 @@ With FLUX.1 Kontext you can modify an input image via simple text instructions, 
 - Interactive Speed: Minimal latency for both image generation and editing.
 - Iterate: modify step by step
 
-Flux.1 Kontext allows you to iteratively add more instructions and build on previous edits, refining your creation step-by-step with minimal latency, while preserving image quality and character consistency.
+FLUX 2 allows you to iteratively add more instructions and build on previous edits, refining your creation step-by-step with minimal latency, while preserving image quality and character consistency.
 
 # Final instructions.
 
@@ -84,7 +83,7 @@ ONLY RESPOND IN JSON. NOTHING ELSE.
         ],
       },
     ],
-    // response_format: { type: "json_schema", schema: jsonSchema },
+    response_format: { type: "json_object", schema: jsonSchema },
   });
 
   if (!response?.choices?.[0]?.message?.content) return [];

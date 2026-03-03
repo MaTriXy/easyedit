@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     try {
       // Make a simple chat completion call to validate the API key
       await together.chat.completions.create({
-        model: "Qwen/Qwen2.5-72B-Instruct-Turbo",
+        model: "moonshotai/Kimi-K2.5",
         messages: [
           {
             role: "user",
