@@ -11,41 +11,6 @@ const shimmer = `
   }
 `;
 
-async function compressImage(
-  url: string,
-  maxWidth: number = 300,
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const scale = maxWidth / img.width;
-      const width = maxWidth;
-      const height = img.height * scale;
-
-      canvas.width = width;
-      canvas.height = height;
-
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        reject(new Error("Failed to get canvas context"));
-        return;
-      }
-
-      ctx.drawImage(img, 0, 0, width, height);
-
-      // Convert to JPEG with 0.8 quality for smaller size
-      const compressedUrl = canvas.toDataURL("image/jpeg", 0.8);
-      resolve(compressedUrl);
-    };
-
-    img.onerror = () => reject(new Error("Failed to load image"));
-    img.src = url;
-  });
-}
-
 export function SuggestedPrompts({
   imageUrl,
   onSelect,
@@ -62,9 +27,6 @@ export function SuggestedPrompts({
     async function fetchSuggestions() {
       setLoading(true);
       try {
-        // Compress image before sending
-        const compressedUrl = await compressImage(imageUrl, 300);
-
         const headers: HeadersInit = {};
         const apiKey = localStorage.getItem("togetherApiKey");
         if (apiKey) {
@@ -72,7 +34,7 @@ export function SuggestedPrompts({
         }
 
         const res = await fetch(
-          `/api/suggested-prompts?imageUrl=${encodeURIComponent(compressedUrl)}`,
+          `/api/suggested-prompts?imageUrl=${encodeURIComponent(imageUrl)}`,
           { headers },
         );
         const data = await res.json();

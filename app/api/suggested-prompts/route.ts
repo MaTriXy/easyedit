@@ -1,6 +1,7 @@
 import { getTogether } from "@/lib/get-together";
 import { getIPAddress, getRateLimiter } from "@/lib/rate-limiter";
 import { NextRequest, NextResponse } from "next/server";
+import sharp from "sharp";
 import { z } from "zod/v4";
 
 const schema = z.array(z.string());
@@ -11,6 +12,27 @@ export const revalidate = 86400;
 const ratelimit = getRateLimiter();
 
 const SYSTEM_PROMPT = `Suggest exactly 3 simple image edits. Output ONLY a JSON array of 3 short strings (5-8 words each). Example: ["edit 1","edit 2","edit 3"]`;
+
+async function fetchAndCompressImage(imageUrl: string): Promise<string> {
+  // Fetch image server-side (no CORS issues)
+  const response = await fetch(imageUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch image: ${response.status}`);
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
+  // Use sharp to resize and compress
+  const compressedBuffer = await sharp(buffer)
+    .resize(300, 300, { fit: "inside", withoutEnlargement: true })
+    .jpeg({ quality: 80, progressive: true })
+    .toBuffer();
+
+  // Convert to base64 data URL
+  const base64 = compressedBuffer.toString("base64");
+  return `data:image/jpeg;base64,${base64}`;
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -44,6 +66,9 @@ export async function GET(request: NextRequest) {
   const together = getTogether(userAPIKey);
 
   try {
+    // Compress image server-side to reduce tokens
+    const compressedImageUrl = await fetchAndCompressImage(imageUrl);
+
     const response = await together.chat.completions.create({
       model,
       max_tokens: 200,
@@ -54,7 +79,7 @@ export async function GET(request: NextRequest) {
         {
           role: "user",
           content: [
-            { type: "image_url", image_url: { url: imageUrl } },
+            { type: "image_url", image_url: { url: compressedImageUrl } },
             { type: "text", text: "Suggest 3 edits." },
           ],
         },

@@ -30,14 +30,17 @@ Used `reasoning: { enabled: false }` to disable thinking mode on hybrid models:
 - Eliminates empty content issue
 - Requires `temperature: 0.6` for instant mode (per docs)
 
-### 3. Image Compression
+### 3. Image Compression (Server-Side)
 
-Added client-side canvas compression in `SuggestedPrompts.tsx`:
+Added server-side image processing using Sharp:
 
-- Resizes images to max 300px width
+- Fetches image from any URL (no CORS issues server-side)
+- Resizes to max 300px on longest edge
 - Converts to JPEG at 80% quality
-- Sends base64 data URL to API
-- Significantly reduces vision tokens
+- Sends base64 data URL to Together AI
+- Reduces vision tokens significantly
+
+**Note:** Client-side canvas compression was attempted but reverted due to CORS issues with S3-hosted images.
 
 ### 4. API Route Caching
 
@@ -47,11 +50,13 @@ Configured CDN caching via headers:
 - Same image URL cached for 24 hours
 - Served stale for up to 7 days during revalidation
 
-## Benchmark Results (with compression + reasoning disabled)
+**Note:** Client-side image compression was attempted but reverted due to CORS issues with S3-hosted images.
+
+## Benchmark Results (with server-side compression + reasoning disabled)
 
 | Model          | Avg Time  | Valid | Input Cost   | Output Cost  | Total Cost\* |
 | -------------- | --------- | ----- | ------------ | ------------ | ------------ |
-| **Qwen3.5-9B** | **1.65s** | 3/3   | **$0.10/1M** | **$0.15/1M** | ~$0.0003     |
+| **Qwen3.5-9B** | **1.27s** | 3/3   | **$0.10/1M** | **$0.15/1M** | ~$0.0003     |
 | Kimi K2.5      | 1.44s     | 3/3   | $0.50/1M     | $2.80/1M     | ~$0.005      |
 | Qwen3.5-397B   | 1.17s     | 3/3   | $0.60/1M     | $3.60/1M     | ~$0.006      |
 
@@ -67,7 +72,7 @@ temperature: 0.6
 reasoning: { enabled: false }
 response_format: { type: "json_object", schema: jsonSchema }
 
-// Client-side compression
+// Server-side compression (Sharp)
 maxWidth: 300px
 quality: 0.8 JPEG
 ```
@@ -78,8 +83,8 @@ quality: 0.8 JPEG
 
 ## Files Changed
 
-- `app/api/suggested-prompts/route.ts` - New API route with CDN caching
-- `app/suggested-prompts/SuggestedPrompts.tsx` - Canvas compression, fetch from API
+- `app/api/suggested-prompts/route.ts` - New API route with Sharp image compression + CDN caching
+- `app/suggested-prompts/SuggestedPrompts.tsx` - Fetch from API
 - `scripts/bench-suggested-prompts.ts` - Benchmarking tool
 - Deleted: `app/suggested-prompts/actions.ts` - Old server action
 
@@ -88,3 +93,4 @@ quality: 0.8 JPEG
 - Removed `dedent` and long system prompts - short prompts work better
 - Removed `FLUX 2` context - not needed for simple suggestions
 - SDK types don't include `reasoning` param yet, cast to `any`
+- Added `sharp` dependency for server-side image processing
