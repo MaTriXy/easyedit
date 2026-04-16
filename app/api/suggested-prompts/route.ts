@@ -15,7 +15,7 @@ const SYSTEM_PROMPT = `Suggest exactly 3 simple image edits. Output ONLY a JSON 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const imageUrl = searchParams.get("imageUrl");
-  const model = searchParams.get("model") || "moonshotai/Kimi-K2.5";
+  const model = searchParams.get("model") || "Qwen/Qwen3.5-9B";
 
   if (!imageUrl) {
     return NextResponse.json(
