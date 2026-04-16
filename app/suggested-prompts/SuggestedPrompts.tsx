@@ -1,7 +1,4 @@
-import { startTransition, useActionState, useEffect } from "react";
-import { getSuggestions } from "./actions";
-
-const cache = new Map<string, string[]>();
+import { useEffect, useState } from "react";
 
 const shimmer = `
   @keyframes shimmer {
@@ -21,40 +18,53 @@ export function SuggestedPrompts({
   imageUrl: string;
   onSelect: (v: string) => void;
 }) {
-  const [state, action, pending] = useActionState<{
-    url: string;
-    suggestions: string[];
-  } | null>(async () => {
-    let cachedSuggestions = cache.get(imageUrl);
-
-    if (!cachedSuggestions) {
-      const newSuggestions = await getSuggestions(
-        imageUrl,
-        localStorage.getItem("togetherApiKey"),
-      );
-      cache.set(imageUrl, newSuggestions);
-      cachedSuggestions = newSuggestions;
-    }
-
-    return { url: imageUrl, suggestions: cachedSuggestions };
-  }, null);
+  const [suggestions, setSuggestions] = useState<string[] | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!pending && state?.url !== imageUrl) {
-      setTimeout(() => {
-        startTransition(() => {
-          action();
-        });
-      }, 50);
+    let cancelled = false;
+
+    async function fetchSuggestions() {
+      setLoading(true);
+      try {
+        const headers: HeadersInit = {};
+        const apiKey = localStorage.getItem("togetherApiKey");
+        if (apiKey) {
+          headers["x-api-key"] = apiKey;
+        }
+
+        const res = await fetch(
+          `/api/suggested-prompts?imageUrl=${encodeURIComponent(imageUrl)}`,
+          { headers },
+        );
+        const data = await res.json();
+
+        if (!cancelled) {
+          setSuggestions(data.suggestions ?? []);
+        }
+      } catch {
+        if (!cancelled) {
+          setSuggestions([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
     }
-  }, [action, imageUrl, pending, state?.url]);
+
+    fetchSuggestions();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [imageUrl]);
 
   return (
     <div className="p-2 md:p-4">
       <style>{shimmer}</style>
 
-      {/* {true ? ( */}
-      {pending || !state ? (
+      {loading || suggestions === null ? (
         <div className="grid grid-cols-3 gap-2 pb-4">
           {Array.from(Array(3).keys()).map((i) => (
             <div
@@ -65,7 +75,7 @@ export function SuggestedPrompts({
         </div>
       ) : (
         <div className="-mx-2 flex gap-2 overflow-x-auto px-2 pb-4 md:-mx-4 md:px-4">
-          {state?.suggestions.map((suggestion, i) => (
+          {suggestions.map((suggestion, i) => (
             <button
               key={i}
               type="button"
