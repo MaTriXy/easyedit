@@ -29,7 +29,7 @@ export async function getSuggestions(
   const together = getTogether(userAPIKey);
 
   const response = await together.chat.completions.create({
-    model: "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
+    model: "Qwen/Qwen3.5-9B",
     messages: [
       {
         role: "system",
